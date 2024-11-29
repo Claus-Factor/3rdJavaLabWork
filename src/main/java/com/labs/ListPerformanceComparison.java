@@ -3,11 +3,19 @@ package com.labs;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ListPerformanceComparison {
 
     public static void main(String[] args) {
-        int iterations = 100000; // количество операций
+
+        Scanner scanner = new Scanner(System.in);
+        int iterations;
+        System.out.println("Введите количество операция для проверки: ");
+        iterations = scanner.nextInt();
+
+//        iterations = 100000; // количество операций
+
         comparePerformance(iterations);
     }
 
@@ -15,53 +23,92 @@ public class ListPerformanceComparison {
         List<Integer> arrayList = new ArrayList<>();
         List<Integer> linkedList = new LinkedList<>();
 
-        System.out.printf("%-15s | %-10s | %-15s | %-15s%n", "Method", "Iterations", "ArrayList (ms)", "LinkedList (ms");
-        System.out.println("-------------------------------------------------------------");
+        // Создаем таблицу для вывода результатов
+        System.out.printf("%-15s | %-10s | %-15s | %-15s%n", "Method", "Operations", "ArrayList (ms)", "LinkedList (ms");
+        System.out.println("---------------------------------------------------------------");
 
-        // Test add method
-        System.out.printf("%-15s | %-10d | %-15d | %-15d%n",
-                "add", iterations, testAdd(arrayList, iterations), testAdd(linkedList, iterations));
+        // Тестируем метод add
+        testMethod("add", iterations, new ArrayList<>(), new LinkedList<>());
 
-        // Test get method
-        System.out.printf("%-15s | %-10d | %-15d | %-15d%n",
-                "get", iterations, testGet(arrayList, iterations), testGet(linkedList, iterations));
+        // Тестируем метод get
+        testMethod("get", iterations, new ArrayList<>(), new LinkedList<>());
 
-        // Test delete method
-        System.out.printf("%-15s | %-10d | %-15d | %-15d%n",
-                "delete", iterations, testDelete(arrayList), testDelete(linkedList));
+        // Тестируем метод remove
+        testMethod("remove", iterations, new ArrayList<>(), new LinkedList<>());
     }
 
 
 
-    private static long testAdd(List<Integer> list, int iterations) {
-        long startTime = System.currentTimeMillis();
-        for (int i = 0; i < iterations; i++) {
-            list.add(i);
-        }
-        return System.currentTimeMillis() - startTime;
-    }
+    private static void testMethod(String methodName, int iterations, List<Integer> arrayList, List<Integer> linkedList) {
+        long arrayListTime = 0;
+        long linkedListTime = 0;
 
-    private static long testGet(List<Integer> list, int iterations) {
-        // Ensure the list is filled
-        for (int i = 0; i < iterations; i++) {
-            list.add(i);
+        // Подготовка данных для методов get и remove
+        if (methodName.equals("get") || methodName.equals("remove")) {
+            for (int i = 0; i < iterations; i++) {
+                arrayList.add(i);
+                linkedList.add(i);
+            }
         }
-        long startTime = System.currentTimeMillis();
-        for (int i = 0; i < iterations; i++) {
-            list.get(i);
-        }
-        return System.currentTimeMillis() - startTime;
-    }
 
-    private static long testDelete(List<Integer> list) {
-        // Ensure the list is filled
-        for (int i = 0; i < list.size(); i++) {
-            list.add(i);
+        // Измеряем время для ArrayList
+        switch (methodName) {
+            case "add" -> {
+                long start = System.nanoTime();
+                for (int i = 0; i < iterations; i++) {
+                    arrayList.add(i);
+                }
+                long end = System.nanoTime();
+                arrayListTime = end - start;
+            }
+            case "get" -> {
+                long start = System.nanoTime();
+                for (int i = 0; i < iterations; i++) {
+                    arrayList.get(i % arrayList.size()); // Операция get
+                }
+                long end = System.nanoTime();
+                arrayListTime = end - start;
+            }
+            case "remove" -> {
+                long start = System.nanoTime();
+                while (!arrayList.isEmpty()) {
+                    arrayList.remove(arrayList.size() / 2); // Удаляем из середины
+                }
+                long end = System.nanoTime();
+                arrayListTime = end - start;
+            }
         }
-        long startTime = System.currentTimeMillis();
-        while (!list.isEmpty()) {
-            list.remove(0); // удаляем из начала списка
+
+        // Измеряем время для LinkedList
+        switch (methodName) {
+            case "add" -> {
+                long start = System.nanoTime();
+                for (int i = 0; i < iterations; i++) {
+                    linkedList.add(i);
+                }
+                long end = System.nanoTime();
+                linkedListTime = end - start;
+            }
+            case "get" -> {
+                long start = System.nanoTime();
+                for (int i = 0; i < iterations; i++) {
+                    linkedList.get(i % linkedList.size()); // Операция get
+                }
+                long end = System.nanoTime();
+                linkedListTime = end - start;
+            }
+            case "remove" -> {
+                long start = System.nanoTime();
+                while (!linkedList.isEmpty()) {
+                    linkedList.remove(linkedList.size() / 2); // Удаляем из середины
+                }
+                long end = System.nanoTime();
+                linkedListTime = end - start;
+            }
         }
-        return System.currentTimeMillis() - startTime;
+
+        // Конвертируем время из наносекунд в миллисекунды и выводим результаты
+        System.out.printf("%-15s | %-10d | %-15.3f | %-15.3f%n",
+                methodName, iterations, arrayListTime / 1_000_000.0, linkedListTime / 1_000_000.0);
     }
 }
