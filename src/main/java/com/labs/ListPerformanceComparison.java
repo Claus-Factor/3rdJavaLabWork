@@ -5,24 +5,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Класс для сравнения производительности ArrayList и LinkedList.
+ * Позволяет тестировать основные операции (add, get, remove) и выводить результаты.
+ */
 public class ListPerformanceComparison {
 
+    /**
+     * Главный метод программы. Запрашивает у пользователя количество операций для тестирования
+     * и запускает процесс сравнения производительности.
+     *
+     * @param args аргументы командной строки (не используются)
+     */
     public static void main(String[] args) {
-
         Scanner scanner = new Scanner(System.in);
         int iterations;
-        System.out.println("Введите количество операция для проверки: ");
+        System.out.println("Введите количество операций для проверки: ");
         iterations = scanner.nextInt();
-
-//        iterations = 100000; // количество операций
 
         comparePerformance(iterations);
     }
 
+    /**
+     * Сравнивает производительность выполнения операций (add, get, remove)
+     * для ArrayList и LinkedList.
+     *
+     * @param iterations количество операций, которые будут выполняться
+     */
     public static void comparePerformance(int iterations) {
-        List<Integer> arrayList = new ArrayList<>();
-        List<Integer> linkedList = new LinkedList<>();
-
         // Создаем таблицу для вывода результатов
         System.out.printf("%-15s | %-10s | %-15s | %-15s%n", "Method", "Operations", "ArrayList (ms)", "LinkedList (ms");
         System.out.println("---------------------------------------------------------------");
@@ -37,8 +47,14 @@ public class ListPerformanceComparison {
         testMethod("remove", iterations, new ArrayList<>(), new LinkedList<>());
     }
 
-
-
+    /**
+     * Выполняет тестирование заданного метода (add, get, remove) для ArrayList и LinkedList.
+     *
+     * @param methodName  название метода, который тестируется ("add", "get" или "remove")
+     * @param iterations  количество операций, которые будут выполняться
+     * @param arrayList   экземпляр ArrayList для тестирования
+     * @param linkedList  экземпляр LinkedList для тестирования
+     */
     private static void testMethod(String methodName, int iterations, List<Integer> arrayList, List<Integer> linkedList) {
         long arrayListTime = 0;
         long linkedListTime = 0;
